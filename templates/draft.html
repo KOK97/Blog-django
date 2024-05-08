@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %} Draft {% endblock %}
+{% block homeactive %} active {% endblock homeactive %}
+
+{% block css %}
+.btn {
+position: relative;
+background: #444;
+color: #fff;
+text-decoration: none;
+text-transform: uppercase;
+border: none;
+transition: 0.2s;
+}
+
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-3">
+  {% if user.is_superuser %}
+  <div class="row">
+    {% for post in posts_draft %}
+    <div class="col-lg-4 my-4">
+      <div class="card shadow" style="width: 20rem; height: 35rem;">
+        <img src="/media/{{post.image}}" class="card-img-top" alt="..." height="250px">
+        <div class="card-body">
+          <h5 class="card-title">{{post.title}} <br><small>by {{post.author}}</small></h5>
+          <p class="card-text">{{post.content| truncatechars:25}}</p>
+          <a href="blog/{{post.slug}}" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <h3>You are not allowed here!</h3>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  {% if alert %}
+  alert('Your Blog is added successfully.');
+  document.location = '/';
+  {% endif %}
+</script>
+{% endblock %}

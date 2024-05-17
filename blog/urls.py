@@ -14,6 +14,7 @@ urlpatterns = [
     path("edit_blog_post/<str:slug>/", UpdatePostView.as_view(), name="edit_blog_post"),
     path("draft/delete_blog_post/<str:slug>/", views.Delete_Blog_Post, name="delete_blog_post"),
     path("push_draft/<str:slug>/", views.push_draft, name="push_draft"),
+    path('search/', views.search_blogs, name='search_blogs'),
 
     
 #     profile

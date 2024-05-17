@@ -7,6 +7,7 @@ from .forms import ProfileForm, BlogPostForm
 from django.views.generic import UpdateView
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 
 def blogs(request):
@@ -29,6 +30,33 @@ def blogs(request):
         paginated_posts = paginator.page(paginator.num_pages)
 
     return render(request, "blog.html", {'posts': paginated_posts})
+
+def search_blogs(request):
+    query = request.GET.get('q', '')  # Lấy giá trị query từ URL
+    if query:
+        # Tìm kiếm blogs mà có title, author hoặc slug khớp với query
+        blogs = BlogPost.objects.filter(
+            Q(title__icontains=query) | 
+            Q(author__username__icontains=query) | 
+            Q(slug__icontains=query),
+            status='published'  # Chỉ tìm kiếm trong những bài đã được công bố
+        ).order_by('-dateTime')
+    else:
+        blogs = BlogPost.objects.none()  # Trả về queryset rỗng nếu không có query
+
+    # Số lượng bài viết mỗi trang
+    paginator = Paginator(blogs, 3)  # Giả sử mỗi trang có 3 bài viết
+    page_number = request.GET.get('page')
+    try:
+        paginated_blogs = paginator.page(page_number)
+    except PageNotAnInteger:
+        # Nếu trang không phải là số, trả về trang đầu tiên
+        paginated_blogs = paginator.page(1)
+    except EmptyPage:
+        # Nếu trang không có nội dung, trả về trang cuối cùng
+        paginated_blogs = paginator.page(paginator.num_pages)
+
+    return render(request, 'blog.html', {'posts': paginated_blogs,'query': query})
 
 def blogs_comments(request, slug):
     post = BlogPost.objects.filter(slug=slug).first()
